@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace WordFrequency
@@ -20,37 +21,24 @@ namespace WordFrequency
                 //split the input string with 1 to n pieces of spaces
                 string[] splittedWords = Regex.Split(inputStr, SpaceForSplit);
 
-                List<WordCount> wordCountList = new List<WordCount>();
-                foreach (var word in splittedWords)
-                {
-                    WordCount input = new WordCount(word, 1);
-                    wordCountList.Add(input);
-                }
+                List<WordCount> wordCountList =
+                    splittedWords.Select(word => new WordCount(word, 1)).ToList();
 
                 //get the map for the next step of sizing the same word
                 Dictionary<string, List<WordCount>> map = GetListMap(wordCountList);
 
-                List<WordCount> list = new List<WordCount>();
-                foreach (var entry in map)
-                {
-                    WordCount input = new WordCount(entry.Key, entry.Value.Count);
-                    list.Add(input);
-                }
+                // now the list has no repeation
+                wordCountList =
+                    map.Select(entry => new WordCount(entry.Key, entry.Value.Count)).ToList();
 
-                wordCountList = list;
+                // now the order is descending
+                wordCountList.Sort((word1, word2) => word2.Count - word1.Count);
 
-                wordCountList.Sort((w1, w2) => w2.Count - w1.Count);
-
-                List<string> strList = new List<string>();
+                List<string> wordsExpressionList =
+                    wordCountList.Select(wordCount => wordCount.Word + " " + wordCount.Count).ToList();
 
                 //stringJoiner joiner = new stringJoiner("\n");
-                foreach (WordCount wordCount in wordCountList)
-                {
-                    string wordWithCount = wordCount.Word + " " + wordCount.Count;
-                    strList.Add(wordWithCount);
-                }
-
-                return string.Join("\n", strList.ToArray());
+                return string.Join("\n", wordsExpressionList.ToArray());
             }
         }
 
