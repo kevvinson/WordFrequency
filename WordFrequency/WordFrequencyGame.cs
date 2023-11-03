@@ -21,46 +21,16 @@ namespace WordFrequency
                 //split the input string with 1 to n pieces of spaces
                 string[] splittedWords = Regex.Split(inputStr, SpaceForSplit);
 
-                List<WordCount> wordCountList =
-                    splittedWords.Select(word => new WordCount(word, 1)).ToList();
-
-                //get the map for the next step of sizing the same word
-                Dictionary<string, List<WordCount>> map = GetListMap(wordCountList);
-
-                // now the list has no repeation
-                wordCountList =
-                    map.Select(entry => new WordCount(entry.Key, entry.Value.Count)).ToList();
-
-                // now the order is descending
-                wordCountList.Sort((word1, word2) => word2.Count - word1.Count);
-
-                List<string> wordsExpressionList =
-                    wordCountList.Select(wordCount => wordCount.Word + " " + wordCount.Count).ToList();
+                List<string> resultWordCount = splittedWords.
+                    GroupBy(x => x).
+                    Select(x => new WordCount(x.Key, x.Count())).
+                    OrderByDescending(x => x.Count).
+                    Select(x => x.Word + " " + x.Count).
+                    ToList();
 
                 //stringJoiner joiner = new stringJoiner("\n");
-                return string.Join("\n", wordsExpressionList.ToArray());
+                return string.Join("\n", resultWordCount.ToArray());
             }
-        }
-
-        private Dictionary<string, List<WordCount>> GetListMap(List<WordCount> inputList)
-        {
-            Dictionary<string, List<WordCount>> map = new Dictionary<string, List<WordCount>>();
-            foreach (var input in inputList)
-            {
-                //       map.computeIfAbsent(input.getValue(), k -> new ArrayList<>()).add(input);
-                if (!map.ContainsKey(input.Word))
-                {
-                    List<WordCount> arr = new List<WordCount>();
-                    arr.Add(input);
-                    map.Add(input.Word, arr);
-                }
-                else
-                {
-                    map[input.Word].Add(input);
-                }
-            }
-
-            return map;
         }
     }
 }
