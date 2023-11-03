@@ -22,9 +22,13 @@ namespace WordFrequency
                 string[] splittedWords = Regex.Split(inputStr, SpaceForSplit);
 
                 List<string> resultWordCount = splittedWords.
+                    //group the words so that no repeation
                     GroupBy(x => x).
+                    //count words and generate class WordCount to store data
                     Select(x => new WordCount(x.Key, x.Count())).
+                    //make the order right
                     OrderByDescending(x => x.Count).
+                    //generate proper string expression for words
                     Select(x => x.Word + " " + x.Count).
                     ToList();
 
